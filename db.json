@@ -1,0 +1,55 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Jefferson Cacerez",
+      "email": "admin@riwiflow.com",
+      "password": "admin123",
+      "role": "admin"
+    },
+    {
+      "id": "2",
+      "name": "Dylan Black",
+      "email": "coder01@riwiflow.com",
+      "password": "coder123",
+      "role": "coder"
+    },
+    {
+      "id": "3",
+      "name": "Jhonatan Jose",
+      "email": "coder02@riwiflow.com",
+      "password": "coder123",
+      "role": "coder"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "1",
+      "title": "Design onboarding flow",
+      "description": "Define the first version of the product onboarding experience.",
+      "status": "in-progress",
+      "userId": "2"
+    },
+    {
+      "id": "2",
+      "title": "Create social media assets",
+      "description": "Prepare promotional graphics for the launch campaign.",
+      "status": "todo",
+      "userId": "2"
+    },
+    {
+      "id": "3",
+      "title": "Update API documentation",
+      "description": "Document the task and user endpoints used by RiwiFlow.",
+      "status": "done",
+      "userId": "3"
+    },
+    {
+      "id": "4",
+      "title": "Review Kanban permissions",
+      "description": "Validate that coders only edit their own assigned tasks.",
+      "status": "in-review",
+      "userId": "3"
+    }
+  ]
+}

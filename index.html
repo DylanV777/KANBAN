@@ -1,0 +1,269 @@
+<!doctype html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>RiwiFlow</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#5300b7",
+              "primary-container": "#6d28d9",
+              "primary-fixed": "#ebddff",
+              "on-primary": "#ffffff",
+              "on-primary-fixed-variant": "#5b00c5",
+              secondary: "#5d5d67",
+              "secondary-container": "#e3e1ed",
+              "on-secondary-container": "#46464f",
+              background: "#fef7ff",
+              surface: "#ffffff",
+              "surface-container": "#f3ebf9",
+              "surface-container-low": "#f9f1ff",
+              "on-surface": "#1d1a24",
+              "on-surface-variant": "#4a4455",
+              outline: "#7b7486",
+              "outline-variant": "#ccc3d7",
+              error: "#ba1a1a",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body { font-family: "Inter", sans-serif; }
+      .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+      .view-hidden { display: none !important; }
+      .kanban-column { min-width: 300px; }
+      .task-card[draggable="true"] { cursor: grab; }
+      .task-card:hover { transform: translateY(-2px); transition: transform 0.2s ease; }
+      .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #ccc3d7; border-radius: 999px; }
+    </style>
+  </head>
+
+  <body class="bg-background text-on-surface">
+    <section id="view-login" class="min-h-screen flex items-center justify-center px-6 py-12">
+      <div class="w-full max-w-md">
+        <div class="mb-8 text-center">
+          <h1 class="text-4xl font-extrabold text-primary">RiwiFlow</h1>
+          <p class="mt-2 text-on-surface-variant">Sign in to manage the Kanban board.</p>
+        </div>
+
+        <form id="loginForm" class="bg-surface border border-outline-variant rounded-xl p-8 shadow-sm space-y-5">
+          <div>
+            <label class="block text-sm font-semibold mb-2" for="email">Email</label>
+            <input id="email" class="w-full rounded-lg border-outline-variant" required type="email" placeholder="admin@riwiflow.com" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-2" for="password">Password</label>
+            <input id="password" class="w-full rounded-lg border-outline-variant" required type="password" placeholder="password" />
+          </div>
+          <p id="loginError" class="text-sm text-error min-h-5"></p>
+          <button class="w-full bg-primary text-on-primary rounded-lg py-3 font-semibold flex items-center justify-center gap-2" type="submit">
+            Login
+            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <section id="view-app" class="view-hidden h-screen overflow-hidden flex">
+      <aside class="hidden md:flex w-72 shrink-0 bg-surface-container-low border-r border-outline-variant flex-col">
+        <div class="px-6 pt-4 pb-8">
+          <h1 class="text-2xl font-bold text-primary">Riwiflow</h1>
+          <p class="text-sm text-on-surface-variant">Product Team</p>
+        </div>
+
+        <nav class="px-2 space-y-1 flex-1">
+          <button data-view-link="board" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm transition-all">
+            <span class="material-symbols-outlined">dashboard</span>
+            Dashboard
+          </button>
+          <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm text-secondary hover:text-primary hover:bg-primary-container/10 transition-all" type="button">
+            <span class="material-symbols-outlined">assignment</span>
+            Projects
+          </button>
+          <button id="usersNav" data-view-link="users" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm transition-all">
+            <span class="material-symbols-outlined">group</span>
+            Team
+          </button>
+          <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm text-secondary hover:text-primary hover:bg-primary-container/10 transition-all" type="button">
+            <span class="material-symbols-outlined">bar_chart</span>
+            Reports
+          </button>
+          <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm text-secondary hover:text-primary hover:bg-primary-container/10 transition-all" type="button">
+            <span class="material-symbols-outlined">settings</span>
+            Settings
+          </button>
+        </nav>
+
+        <div class="px-4 pb-4">
+          <button id="openTaskModalBtn" class="w-full bg-primary text-on-primary py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-opacity" type="button">
+            <span class="material-symbols-outlined">add</span>
+            New Task
+          </button>
+        </div>
+
+        <div class="p-4 border-t border-outline-variant">
+          <div class="flex items-center gap-3">
+            <div id="currentUserInitial" class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold"></div>
+            <div class="min-w-0">
+              <p id="currentUserName" class="font-semibold truncate"></p>
+              <p id="currentUserEmail" class="text-xs text-on-surface-variant truncate"></p>
+              <span id="currentUserRole" class="inline-flex mt-1 text-xs bg-primary-fixed text-on-primary-fixed-variant px-2 py-0.5 rounded-full"></span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="min-w-0 flex-1 flex flex-col">
+        <header class="h-16 bg-surface border-b border-outline-variant px-4 md:px-6 flex items-center justify-between z-40">
+          <div class="relative max-w-md w-full">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+            <input class="w-full pl-10 pr-4 py-2 bg-surface-container border border-outline-variant rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="Search tasks or files..." type="text" />
+          </div>
+          <div class="flex items-center gap-4 ml-4">
+            <button data-view-link="board" class="md:hidden material-symbols-outlined p-2 rounded-lg bg-surface-container">dashboard</button>
+            <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors" type="button">notifications</button>
+            <button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors" type="button">help_outline</button>
+            <button id="logoutBtn" class="bg-error text-white px-4 py-2 rounded-lg font-semibold" type="button">Logout</button>
+          </div>
+        </header>
+
+        <section id="boardView" class="flex-1 min-h-0 flex flex-col">
+          <div class="px-4 md:px-6 py-4 flex items-center justify-between gap-4">
+            <div>
+              <h3 class="text-2xl font-bold">Kanban Board</h3>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-auto custom-scrollbar px-4 md:px-6 pb-6">
+            <div class="flex gap-5 min-w-max">
+              <section class="kanban-column bg-surface-container-low rounded-2xl p-4">
+                <h4 class="font-bold mb-4">Todo</h4>
+                <div id="todo-column" class="flex flex-col gap-4 min-h-[62vh] rounded-lg"></div>
+              </section>
+              <section class="kanban-column bg-surface-container-low rounded-2xl p-4">
+                <h4 class="font-bold mb-4">In Progress</h4>
+                <div id="progress-column" class="flex flex-col gap-4 min-h-[62vh] rounded-lg"></div>
+              </section>
+              <section class="kanban-column bg-surface-container-low rounded-2xl p-4">
+                <h4 class="font-bold mb-4">In Review</h4>
+                <div id="review-column" class="flex flex-col gap-4 min-h-[62vh] rounded-lg"></div>
+              </section>
+              <section class="kanban-column bg-surface-container-low rounded-2xl p-4">
+                <h4 class="font-bold mb-4">Done</h4>
+                <div id="done-column" class="flex flex-col gap-4 min-h-[62vh] rounded-lg"></div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section id="usersView" class="view-hidden flex-1 overflow-auto p-4 md:p-6 custom-scrollbar">
+          <div class="flex items-center justify-between gap-4 mb-5">
+            <div>
+              <h3 class="text-2xl font-bold">Users</h3>
+              <p class="text-sm text-on-surface-variant">Admins can add, edit and delete team members.</p>
+            </div>
+            <button id="openUserModalBtn" class="bg-primary text-on-primary rounded-lg px-4 py-2 font-semibold flex items-center gap-2" type="button">
+              <span class="material-symbols-outlined text-lg">person_add</span>
+              New User
+            </button>
+          </div>
+
+          <div class="bg-surface border border-outline-variant rounded-xl overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-surface-container">
+                <tr>
+                  <th class="py-3 px-4 text-left">Name</th>
+                  <th class="py-3 px-4 text-left">Email</th>
+                  <th class="py-3 px-4 text-left">Role</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </section>
+
+    <div id="taskModal" class="view-hidden fixed inset-0 bg-black/40 p-4 flex items-center justify-center">
+      <form id="taskForm" class="bg-surface rounded-xl border border-outline-variant w-full max-w-lg p-6 space-y-4 shadow-lg">
+        <div class="flex items-center justify-between">
+          <h3 id="taskModalTitle" class="text-xl font-bold">Task</h3>
+          <button id="closeTaskModalBtn" class="material-symbols-outlined" type="button">close</button>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1" for="taskTitle">Title</label>
+          <input id="taskTitle" class="w-full rounded-lg border-outline-variant" required />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1" for="taskDescription">Description</label>
+          <textarea id="taskDescription" class="w-full rounded-lg border-outline-variant" required rows="3"></textarea>
+        </div>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1" for="taskStatus">Status</label>
+            <select id="taskStatus" class="w-full rounded-lg border-outline-variant">
+              <option value="todo">Todo</option>
+              <option value="in-progress">In Progress</option>
+              <option value="in-review">In Review</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1" for="taskUser">Assigned user</label>
+            <select id="taskUser" class="w-full rounded-lg border-outline-variant"></select>
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button id="cancelTaskBtn" class="px-4 py-2 rounded-lg border border-outline-variant font-semibold" type="button">Cancel</button>
+          <button class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold" type="submit">Save Task</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="userModal" class="view-hidden fixed inset-0 bg-black/40 p-4 flex items-center justify-center">
+      <form id="userForm" class="bg-surface rounded-xl border border-outline-variant w-full max-w-lg p-6 space-y-4 shadow-lg">
+        <div class="flex items-center justify-between">
+          <h3 id="userModalTitle" class="text-xl font-bold">User</h3>
+          <button id="closeUserModalBtn" class="material-symbols-outlined" type="button">close</button>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1" for="userName">Name</label>
+          <input id="userName" class="w-full rounded-lg border-outline-variant" required />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1" for="userEmail">Email</label>
+          <input id="userEmail" class="w-full rounded-lg border-outline-variant" required type="email" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1" for="userPassword">Password</label>
+          <input id="userPassword" class="w-full rounded-lg border-outline-variant" required type="text" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1" for="userRole">Role</label>
+          <select id="userRole" class="w-full rounded-lg border-outline-variant">
+            <option value="coder">Coder</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button id="cancelUserBtn" class="px-4 py-2 rounded-lg border border-outline-variant font-semibold" type="button">Cancel</button>
+          <button class="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold" type="submit">Save User</button>
+        </div>
+      </form>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
