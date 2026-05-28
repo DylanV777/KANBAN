@@ -32,6 +32,19 @@ kanban-project/
 |-- Readme.md
 ```
 
+## Technologies Used
+
+- HTML5
+- CSS3
+- Tailwind CSS
+- JavaScript
+- JSON Server
+- LocalStorage
+- REST API
+- SPA routing with hash navigation
+- Drag and Drop API
+- Git and GitHub
+
 ## Run the Backend
 
 ```bash
